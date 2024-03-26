@@ -166,6 +166,7 @@ def parse_837(file_name):
         output['Claim'][-1]['PatientAccountNumber'] = segments[index][1]
         output['Claim'][-1]['TotalClaimChargeAmount'] = float(segments[index][2])
         output['Claim'][-1]['AccidentDate'] = ''
+        output['Claim'][-1]['ServiceDate'] = ''
         output['Claim'][-1]['MedicalRecordNumber'] = ''
         index += 1
         first = True
@@ -287,6 +288,7 @@ def parse_837(file_name):
               index += 1
             if segments[index][0] == 'DTP':
               index += 1
+      # print(output['Claim'][-1])
       if output['Claim'][-1]['AccidentDate'] == "":
         output['Claim'][-1]['AccidentDate'] = output['Claim'][-1]['ServiceDate']
     
