@@ -66,6 +66,19 @@ def add_to_database(claim_837, claim_835):
   mysql_conn.commit()
 
 if __name__ == '__main__':
+  query = f"DELETE FROM rebound_adjustment;"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_claim;"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_diagnosis;"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_patient;"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_payer;"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_service;"
+  cursor.execute(query)
+
   base_dir_837 = "C:/Users/DevOps/Documents/837/"
   base_dir_835 = "C:/Users/DevOps/Documents/835/"
   claims_837 = []
