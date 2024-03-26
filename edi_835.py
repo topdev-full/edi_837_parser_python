@@ -149,6 +149,7 @@ def parse_835(file_name):
     if segments[index][0] == 'SE':
       index += 1
     # print(output['Claim'], len(output['Claim']))
+    # return len(output['Claim'])
     return output
 
 if __name__ == '__main__':

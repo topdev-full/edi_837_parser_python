@@ -3,7 +3,7 @@ import os
 from edi_835 import parse_835
 
 if __name__ == '__main__':
-  base_dir = "F:/data/835_Raw/"
+  base_dir = "C:/Users/DevOps/Documents/837/"
   for file_name in os.listdir(base_dir):
     # print(file_name)
     cnt1 = parse_835(base_dir+file_name)

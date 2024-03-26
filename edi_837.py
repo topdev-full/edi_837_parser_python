@@ -300,6 +300,8 @@ def parse_837(file_name):
     if segments[index][0] == 'IEA':
       index += 1
   # print(output['Claim'], len(output['Claim']))
+  # for claim in output['Claim']:
+    # print(claim['PatientAccountNumber'])
   # return len(output['Claim'])
   return output
 

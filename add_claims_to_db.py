@@ -15,12 +15,12 @@ mysql_conn = mysql.connector.connect(
 cursor = mysql_conn.cursor()
 
 def add_to_database_1(claim_837):
-  query = f"SELECT * FROM rebound_claim WHERE PatientAccountNumber='{claim_837['PatientAccountNumber']}'"
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if len(result) == 1:
-    return
-  print(claim_837)
+  # query = f"SELECT * FROM rebound_claim WHERE PatientAccountNumber='{claim_837['PatientAccountNumber']}'"
+  # cursor.execute(query)
+  # result = cursor.fetchall()
+  # if len(result) == 1:
+  #   return
+  # print(claim_837)
   patient_uuid = str(uuid.uuid4())
   query = f"""INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES("{patient_uuid}", "{claim_837['Patient']['FirstName']}", "{claim_837['Patient']['LastName']}", "{claim_837['Patient']['MiddleName']}", "{claim_837['Patient']['Address']}", "{claim_837['Patient']['City']}", "{claim_837['Patient']['State']}", "{claim_837['Patient']['ZipCode']}", "{claim_837['Patient']['Birthday']}", "{claim_837['Patient']['Gender']}", "{claim_837['Patient']['SSN']}")"""
   cursor.execute(query)
@@ -42,7 +42,7 @@ def add_to_database_1(claim_837):
 
 
 def add_to_database(claim_837, claim_835):
-  print(claim_837, claim_835)
+  # print(claim_837, claim_835)
   patient_uuid = str(uuid.uuid4())
   query = f"""INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES("{patient_uuid}", "{claim_837['Patient']['FirstName']}", "{claim_837['Patient']['LastName']}", "{claim_837['Patient']['MiddleName']}", "{claim_837['Patient']['Address']}", "{claim_837['Patient']['City']}", "{claim_837['Patient']['State']}", "{claim_837['Patient']['ZipCode']}", "{claim_837['Patient']['Birthday']}", "{claim_837['Patient']['Gender']}", "{claim_837['Patient']['SSN']}")"""
   cursor.execute(query)
@@ -66,8 +66,8 @@ def add_to_database(claim_837, claim_835):
   mysql_conn.commit()
 
 if __name__ == '__main__':
-  base_dir_837 = "F:/data/837_Raw/"
-  base_dir_835 = "F:/data/835_Raw/"
+  base_dir_837 = "C:/Users/DevOps/Documents/837/"
+  base_dir_835 = "C:/Users/DevOps/Documents/835/"
   claims_837 = []
   claims_835 = []
   index_set_835 = {}
@@ -92,6 +92,8 @@ if __name__ == '__main__':
       claims_835.append(claim)
   cnt = 0
   print('running...')
+  print(len(claims_837), len(claims_835))
+  # sys.exit()
   for i in range(len(claims_837)):
     if claims_837[i]['PatientAccountNumber'] in index_set_835:
       for ind in range(len(index_set_835[claims_837[i]['PatientAccountNumber']])):
@@ -112,8 +114,10 @@ if __name__ == '__main__':
             if k == len(claims_837[i]['Services']):
               cnt += 1
               add_to_database(claims_837[i], claims_835[j])
-              print(claims_837[i], claims_835[j])
+              # print(claims_837[i], claims_835[j])
               print(cnt)
               break
       if ind == len(index_set_835[claims_837[i]['PatientAccountNumber']]):
         add_to_database_1(claims_837[i])
+        cnt += 1
+        print(cnt)
