@@ -64,11 +64,18 @@ def export_diagnosis():
     diag = ",".join(diag)
     servi = ",".join(servi)
     carccarc = ",".join(carccarc)
-    query = f"INSERT INTO rebound_predict(id, diagnosis, service, adjustment) VALUES('{str(uuid.uuid4())}', '{diag}', '{servi}', '{carccarc}')"
-    cursor.execute(query)
     cnt += 1
+    if cnt == 1:
+      query = f"INSERT INTO rebound_predict VALUES ('{str(uuid.uuid4())}', '{diag}', '{servi}', '{carccarc}')"
+    else if cnt == 1000:
+      cursor.execute(query)
+      cnt = 0
+    else:
+      query += f", ('{str(uuid.uuid4())}', '{diag}', '{servi}', '{carccarc}')"
     print(cnt)
-    mysql_conn.commit()
+  if cnt != 0:
+    cursor.execute(query)
+  mysql_conn.commit()
   
   
 def export_icd():
