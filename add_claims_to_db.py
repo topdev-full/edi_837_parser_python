@@ -15,12 +15,12 @@ mysql_conn = mysql.connector.connect(
 cursor = mysql_conn.cursor()
 
 def add_to_database_1(claim_837):
-  # query = f"SELECT * FROM rebound_claim WHERE PatientAccountNumber='{claim_837['PatientAccountNumber']}'"
-  # cursor.execute(query)
-  # result = cursor.fetchall()
-  # if len(result) == 1:
-  #   return
-  # print(claim_837)
+  query = f"SELECT * FROM rebound_claim WHERE PatientAccountNumber='{claim_837['PatientAccountNumber']}'"
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if len(result) == 1:
+    return
+  print(claim_837)
   patient_uuid = str(uuid.uuid4())
   query = f"""INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES("{patient_uuid}", "{claim_837['Patient']['FirstName']}", "{claim_837['Patient']['LastName']}", "{claim_837['Patient']['MiddleName']}", "{claim_837['Patient']['Address']}", "{claim_837['Patient']['City']}", "{claim_837['Patient']['State']}", "{claim_837['Patient']['ZipCode']}", "{claim_837['Patient']['Birthday']}", "{claim_837['Patient']['Gender']}", "{claim_837['Patient']['SSN']}")"""
   cursor.execute(query)
@@ -36,12 +36,18 @@ def add_to_database_1(claim_837):
   for i in range(len(claim_837['Services'])):
     service = claim_837['Services'][i]
     service_id = str(uuid.uuid4())
-    query = f"INSERT INTO rebound_service(id, ClaimID, ChargeAmount, PaymentAmount, Units, ServiceDate, SourceID, Code, Modifier, Remark) VALUES('{service_id}', '{claim_uuid}', '{service['ChargeAmount']}', '{claim_835['Service'][i]['PayAmount']}', '{service['Units']}', '{service['ServiceDate']}', '{service['SourceID']}', '{service['Code']}', '{service['Modifier']}', '{claim_835['Service'][i]['Remark']}')"
+    query = f"INSERT INTO rebound_service(id, ClaimID, ChargeAmount, PaymentAmount, Units, ServiceDate, SourceID, Code, Modifier, Remark) VALUES('{service_id}', '{claim_uuid}', '{service['ChargeAmount']}', '{service['ChargeAmount']}', '{service['Units']}', '{service['ServiceDate']}', '{service['SourceID']}', '{service['Code']}', '{service['Modifier']}', '')"
     cursor.execute(query)
   mysql_conn.commit()
 
 
 def add_to_database(claim_837, claim_835):
+  query = f"SELECT * FROM rebound_claim WHERE PatientAccountNumber='{claim_837['PatientAccountNumber']}'"
+  cursor.execute(query)
+  result = cursor.fetchall()
+  if len(result) == 1:
+    return
+  print(claim_837)
   # print(claim_837, claim_835)
   patient_uuid = str(uuid.uuid4())
   query = f"""INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES("{patient_uuid}", "{claim_837['Patient']['FirstName']}", "{claim_837['Patient']['LastName']}", "{claim_837['Patient']['MiddleName']}", "{claim_837['Patient']['Address']}", "{claim_837['Patient']['City']}", "{claim_837['Patient']['State']}", "{claim_837['Patient']['ZipCode']}", "{claim_837['Patient']['Birthday']}", "{claim_837['Patient']['Gender']}", "{claim_837['Patient']['SSN']}")"""
@@ -134,3 +140,7 @@ if __name__ == '__main__':
         add_to_database_1(claims_837[i])
         cnt += 1
         print(cnt)
+    else:
+      add_to_database_1(claims_837[i])
+      cnt += 1
+      print(cnt)
