@@ -129,6 +129,7 @@ if __name__ == '__main__':
   # sys.exit()
   for i in range(len(claims_837)):
     if claims_837[i]['PatientAccountNumber'] in index_set_835:
+      ind = 0
       for ind in range(len(index_set_835[claims_837[i]['PatientAccountNumber']])):
         j = index_set_835[claims_837[i]['PatientAccountNumber']][ind]
         if claims_837[i]['PatientAccountNumber'] == claims_835[j]['PatientControlNumber']\
@@ -148,13 +149,13 @@ if __name__ == '__main__':
               cnt += 1
               add_to_database(claims_837[i], claims_835[j])
               # print(claims_837[i], claims_835[j])
-              print(cnt)
+              print(i, cnt)
               break
       if ind == len(index_set_835[claims_837[i]['PatientAccountNumber']]):
         add_to_database_1(claims_837[i])
         cnt += 1
-        print(cnt)
+        print(i, cnt)
     else:
       add_to_database_1(claims_837[i])
       cnt += 1
-      print(cnt)
+      print(i, cnt)
