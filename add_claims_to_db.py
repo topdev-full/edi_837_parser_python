@@ -151,11 +151,7 @@ if __name__ == '__main__':
               # print(claims_837[i], claims_835[j])
               print(i, cnt)
               break
-      if ind == len(index_set_835[claims_837[i]['PatientAccountNumber']]):
-        add_to_database_1(claims_837[i])
-        cnt += 1
-        print(i, cnt)
-    else:
+    if i == cnt:
       add_to_database_1(claims_837[i])
       cnt += 1
       print(i, cnt)
