@@ -165,8 +165,8 @@ def parse_837(file_name):
         output['Claim'][-1]['TaxID'] = billingProvider['TaxID']
         output['Claim'][-1]['PatientAccountNumber'] = segments[index][1]
         output['Claim'][-1]['TotalClaimChargeAmount'] = float(segments[index][2])
-        output['Claim'][-1]['AccidentDate'] = ''
-        output['Claim'][-1]['ServiceDate'] = ''
+        output['Claim'][-1]['AccidentDate'] = '1900-01-01'
+        output['Claim'][-1]['ServiceDate'] = '1900-01-01'
         output['Claim'][-1]['MedicalRecordNumber'] = ''
         index += 1
         first = True
