@@ -28,7 +28,7 @@ def add_to_database_1(claim_837):
   query = f"INSERT INTO rebound_payer(id, Name, Payer_ID, Address, City, State, ZipCode) VALUES('{payer_uuid}', '{claim_837['Payer']['Name']}', '{claim_837['Payer']['ID']}', '{claim_837['Payer']['Address']}', '{claim_837['Payer']['City']}', '{claim_837['Payer']['State']}', '{claim_837['Payer']['ZipCode']}')"
   cursor.execute(query)
   claim_uuid = str(uuid.uuid4())
-  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, TaxID, NPI, Type, Category, Code) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', '{claim_837['TaxID']}', '{claim_837['NPI']}', 'ACTIVE', 'NONE', 'NONE')"
+  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, TaxID, NPI, Type, Category, Code, AuthNumber, Status) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', '{claim_837['TaxID']}', '{claim_837['NPI']}', 'ACTIVE', 'NONE', 'NONE', '{claim_837['AuthNumber']}', 'Review')"
   cursor.execute(query)
   for diagnosis in claim_837['Diagnosis']:
     query = f"INSERT INTO rebound_diagnosis(id, Claim, Code) VALUES('{str(uuid.uuid4())}', '{claim_uuid}', '{diagnosis}')"
@@ -81,7 +81,7 @@ def add_to_database(claim_837, claim_835):
     code = 'No Code'
   else:
     category = results[0][2]
-  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, TaxID, NPI, Type, Category, Code) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', '{claim_837['TaxID']}', '{claim_837['NPI']}', 'DENIED', '{category}', '{code}')"
+  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, TaxID, NPI, Type, Category, Code, AuthNumber, Status) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', '{claim_837['TaxID']}', '{claim_837['NPI']}', 'DENIED', '{category}', '{code}', '{claim_837['AuthNumber']}', 'Review')"
   cursor.execute(query)
   mysql_conn.commit()
 

@@ -168,6 +168,7 @@ def parse_837(file_name):
         output['Claim'][-1]['AccidentDate'] = '1900-01-01'
         output['Claim'][-1]['ServiceDate'] = '1900-01-01'
         output['Claim'][-1]['MedicalRecordNumber'] = ''
+        output['Claim'][-1]['AuthNumber'] = 'N/A'
         index += 1
         first = True
         while segments[index][0] == 'DTP':
@@ -178,7 +179,10 @@ def parse_837(file_name):
         while segments[index][0] == 'PWK':
           index += 1
         while segments[index][0] == 'REF':
-          output['Claim'][-1]['MedicalRecordNumber'] = segments[index][2]
+          if segments[index][1] == 'G1':
+            output['Claim'][-1]['AuthNumber'] = segments[index][2]
+          elif segments[index][1] == 'F8':
+            output['Claim'][-1]['MedicalRecordNumber'] = segments[index][2]
           index += 1
         while segments[index][0] == 'NTE':
           index += 1
