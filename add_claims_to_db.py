@@ -20,7 +20,31 @@ def add_to_database_1(claim_837):
   result = cursor.fetchall()
   if len(result) == 1:
     return
-  print(claim_837)
+  # print(claim_837)
+  if claim_837['BillingProvider']['NPI'] == "":
+    billingprovider_uuid = ""
+  else:
+    query = f"SELECT * FROM rebound_billingprovider WHERE Type='{claim_837['BillingProvider']['Type']}' AND Name='{claim_837['BillingProvider']['Name']}' AND FirstName='{claim_837['BillingProvider']['FirstName']}' AND LastName='{claim_837['BillingProvider']['LastName']}' AND AddressLine1='{claim_837['BillingProvider']['AddressLine1']}' AND AddressLine2='{claim_837['BillingProvider']['AddressLine2']}' AND City='{claim_837['BillingProvider']['City']}' AND State='{claim_837['BillingProvider']['State']}' AND ZipCode='{claim_837['BillingProvider']['ZipCode']}' AND NPI='{claim_837['BillingProvider']['NPI']}' AND TaxID='{claim_837['BillingProvider']['TaxID']}'"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    if len(result) == 0:
+      billingprovider_uuid = str(uuid.uuid4())
+      query = f"INSERT INTO rebound_billingprovider(id, Type, Name, FirstName, LastName, AddressLine1, AddressLine2, City, State, ZipCode, NPI, TaxID) VALUES('{billingprovider_uuid}', '{claim_837['BillingProvider']['Type']}', '{claim_837['BillingProvider']['Name']}', '{claim_837['BillingProvider']['FirstName']}', '{claim_837['BillingProvider']['LastName']}', '{claim_837['BillingProvider']['AddressLine1']}', '{claim_837['BillingProvider']['AddressLine2']}', '{claim_837['BillingProvider']['City']}', '{claim_837['BillingProvider']['State']}', '{claim_837['BillingProvider']['ZipCode']}', '{claim_837['BillingProvider']['NPI']}', '{claim_837['BillingProvider']['TaxID']}')"
+      cursor.execute(query)
+    else:
+      billingprovider_uuid = result[0][0]
+  if claim_837['RenderingProvider']['NPI'] == "":
+    renderingprovider_uuid = ""
+  else:
+    query = f"SELECT * FROM rebound_renderingprovider WHERE Type='{claim_837['RenderingProvider']['Type']}' AND FirstName='{claim_837['RenderingProvider']['FirstName']}' AND LastName='{claim_837['RenderingProvider']['LastName']}' AND Name='{claim_837['RenderingProvider']['Name']}' AND NPI='{claim_837['RenderingProvider']['NPI']}'"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    if len(result) == 0:
+      renderingprovider_uuid = str(uuid.uuid4())
+      query = f"INSERT INTO rebound_renderingprovider(id, Type, FirstName, LastName, Name, NPI) VALUES('{renderingprovider_uuid}', '{claim_837['RenderingProvider']['Type']}', '{claim_837['RenderingProvider']['FirstName']}', '{claim_837['RenderingProvider']['LastName']}', '{claim_837['RenderingProvider']['Name']}', '{claim_837['RenderingProvider']['NPI']}')"
+      cursor.execute(query)
+    else:
+      renderingprovider_uuid = result[0][0]
   patient_uuid = str(uuid.uuid4())
   query = f"""INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES("{patient_uuid}", "{claim_837['Patient']['FirstName']}", "{claim_837['Patient']['LastName']}", "{claim_837['Patient']['MiddleName']}", "{claim_837['Patient']['Address']}", "{claim_837['Patient']['City']}", "{claim_837['Patient']['State']}", "{claim_837['Patient']['ZipCode']}", "{claim_837['Patient']['Birthday']}", "{claim_837['Patient']['Gender']}", "{claim_837['Patient']['SSN']}")"""
   cursor.execute(query)
@@ -28,7 +52,7 @@ def add_to_database_1(claim_837):
   query = f"INSERT INTO rebound_payer(id, Name, Payer_ID, Address, City, State, ZipCode) VALUES('{payer_uuid}', '{claim_837['Payer']['Name']}', '{claim_837['Payer']['ID']}', '{claim_837['Payer']['Address']}', '{claim_837['Payer']['City']}', '{claim_837['Payer']['State']}', '{claim_837['Payer']['ZipCode']}')"
   cursor.execute(query)
   claim_uuid = str(uuid.uuid4())
-  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, TaxID, NPI, Type, Category, Code, AuthNumber, Status) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', '{claim_837['TaxID']}', '{claim_837['NPI']}', 'ACTIVE', 'NONE', 'NONE', '{claim_837['AuthNumber']}', 'Review')"
+  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, Type, Category, Code, AuthNumber, Status, RenderingProvider, BillingProvider) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', 'ACTIVE', 'NONE', 'NONE', '{claim_837['AuthNumber']}', 'Review', '{renderingprovider_uuid}', '{billingprovider_uuid}')"
   cursor.execute(query)
   for diagnosis in claim_837['Diagnosis']:
     query = f"INSERT INTO rebound_diagnosis(id, Claim, Code) VALUES('{str(uuid.uuid4())}', '{claim_uuid}', '{diagnosis}')"
@@ -47,8 +71,32 @@ def add_to_database(claim_837, claim_835):
   result = cursor.fetchall()
   if len(result) == 1:
     return
-  print(claim_837)
+  # print(claim_837)
   # print(claim_837, claim_835)
+  if claim_837['BillingProvider']['NPI'] == "":
+    billingprovider_uuid = ""
+  else:
+    query = f"SELECT * FROM rebound_billingprovider WHERE Type='{claim_837['BillingProvider']['Type']}' AND Name='{claim_837['BillingProvider']['Name']}' AND FirstName='{claim_837['BillingProvider']['FirstName']}' AND LastName='{claim_837['BillingProvider']['LastName']}' AND AddressLine1='{claim_837['BillingProvider']['AddressLine1']}' AND AddressLine2='{claim_837['BillingProvider']['AddressLine2']}' AND City='{claim_837['BillingProvider']['City']}' AND State='{claim_837['BillingProvider']['State']}' AND ZipCode='{claim_837['BillingProvider']['ZipCode']}' AND NPI='{claim_837['BillingProvider']['NPI']}' AND TaxID='{claim_837['BillingProvider']['TaxID']}'"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    if len(result) == 0:
+      billingprovider_uuid = str(uuid.uuid4())
+      query = f"INSERT INTO rebound_billingprovider(id, Type, Name, FirstName, LastName, AddressLine1, AddressLine2, City, State, ZipCode, NPI, TaxID) VALUES('{billingprovider_uuid}', '{claim_837['BillingProvider']['Type']}', '{claim_837['BillingProvider']['Name']}', '{claim_837['BillingProvider']['FirstName']}', '{claim_837['BillingProvider']['LastName']}', '{claim_837['BillingProvider']['AddressLine1']}', '{claim_837['BillingProvider']['AddressLine2']}', '{claim_837['BillingProvider']['City']}', '{claim_837['BillingProvider']['State']}', '{claim_837['BillingProvider']['ZipCode']}', '{claim_837['BillingProvider']['NPI']}', '{claim_837['BillingProvider']['TaxID']}')"
+      cursor.execute(query)
+    else:
+      billingprovider_uuid = result[0][0]
+  if claim_837['RenderingProvider']['NPI'] == "":
+    renderingprovider_uuid = ""
+  else:
+    query = f"SELECT * FROM rebound_renderingprovider WHERE Type='{claim_837['RenderingProvider']['Type']}' AND FirstName='{claim_837['RenderingProvider']['FirstName']}' AND LastName='{claim_837['RenderingProvider']['LastName']}' AND Name='{claim_837['RenderingProvider']['Name']}' AND NPI='{claim_837['RenderingProvider']['NPI']}'"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    if len(result) == 0:
+      renderingprovider_uuid = str(uuid.uuid4())
+      query = f"INSERT INTO rebound_renderingprovider(id, Type, FirstName, LastName, Name, NPI) VALUES('{renderingprovider_uuid}', '{claim_837['RenderingProvider']['Type']}', '{claim_837['RenderingProvider']['FirstName']}', '{claim_837['RenderingProvider']['LastName']}', '{claim_837['RenderingProvider']['Name']}', '{claim_837['RenderingProvider']['NPI']}')"
+      cursor.execute(query)
+    else:
+      renderingprovider_uuid = result[0][0]
   patient_uuid = str(uuid.uuid4())
   query = f"""INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES("{patient_uuid}", "{claim_837['Patient']['FirstName']}", "{claim_837['Patient']['LastName']}", "{claim_837['Patient']['MiddleName']}", "{claim_837['Patient']['Address']}", "{claim_837['Patient']['City']}", "{claim_837['Patient']['State']}", "{claim_837['Patient']['ZipCode']}", "{claim_837['Patient']['Birthday']}", "{claim_837['Patient']['Gender']}", "{claim_837['Patient']['SSN']}")"""
   cursor.execute(query)
@@ -81,7 +129,7 @@ def add_to_database(claim_837, claim_835):
     code = 'No Code'
   else:
     category = results[0][2]
-  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, TaxID, NPI, Type, Category, Code, AuthNumber, Status) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', '{claim_837['TaxID']}', '{claim_837['NPI']}', 'DENIED', '{category}', '{code}', '{claim_837['AuthNumber']}', 'Review')"
+  query = f"INSERT INTO rebound_claim(id, Patient, Payer, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, Type, Category, Code, AuthNumber, Status, RenderingProvider, BillingProvider) VALUES('{claim_uuid}', '{patient_uuid}', '{payer_uuid}', '{claim_837['PatientAccountNumber']}', '{claim_837['TotalClaimChargeAmount']}', '{claim_837['AccidentDate']}', '{claim_837['ServiceDate']}', '{claim_837['MedicalRecordNumber']}', 'ACTIVE', 'NONE', 'NONE', '{claim_837['AuthNumber']}', 'Review', '{renderingprovider_uuid}', '{billingprovider_uuid}')"
   cursor.execute(query)
   mysql_conn.commit()
 
@@ -97,6 +145,10 @@ if __name__ == '__main__':
   query = f"DELETE FROM rebound_payer;"
   cursor.execute(query)
   query = f"DELETE FROM rebound_service;"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_billingprovider"
+  cursor.execute(query)
+  query = f"DELETE FROM rebound_renderingprovider"
   cursor.execute(query)
 
   base_dir_837 = "C:/Users/DevOps/Documents/837/"
@@ -134,8 +186,8 @@ if __name__ == '__main__':
         j = index_set_835[claims_837[i]['PatientAccountNumber']][ind]
         if claims_837[i]['PatientAccountNumber'] == claims_835[j]['PatientControlNumber']\
           and claims_837[i]['TotalClaimChargeAmount'] == claims_835[j]['TotalClaimChargeAmount']\
-          and claims_837[i]['TaxID'] == claims_835[j]['TaxID']\
-          and claims_837[i]['NPI'] == claims_835[j]['NPI']\
+          and claims_837[i]['BillingProvider']['TaxID'] == claims_835[j]['TaxID']\
+          and claims_837[i]['BillingProvider']['NPI'] == claims_835[j]['NPI']\
           and claims_837[i]['ServiceDate'] == claims_835[j]['ServiceDate']:
           k = 0
           if len(claims_837[i]['Services']) == len(claims_835[j]['Service']):
@@ -149,9 +201,9 @@ if __name__ == '__main__':
               cnt += 1
               add_to_database(claims_837[i], claims_835[j])
               # print(claims_837[i], claims_835[j])
-              print(i, cnt)
+              print(i, cnt, 1)
               break
     if i == cnt:
       add_to_database_1(claims_837[i])
       cnt += 1
-      print(i, cnt)
+      print(i, cnt, 0)

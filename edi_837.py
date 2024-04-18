@@ -6,7 +6,26 @@ def parse_837(file_name):
     "Claim": []
   }
   first = True
-  billingProvider = {}
+  billingProvider = {
+    "Type": "",
+    "NPI": "",
+    "TaxID": "",
+    "Name": "",
+    "FirstName": "",
+    "LastName": "",
+    "AddressLine1": "",
+    "AddressLine2": "",
+  }
+  renderingProvider = {
+    "Type": "",
+    "FirstName": "",
+    "LastName": "",
+    "Name": "",
+    "NPI": "",
+  }
+  interpretingProvider = {
+    "NPI": "",
+  }
   with open(file_name, "r") as file1:
     read_content = file1.read()
     segments = read_content.split('~')
@@ -46,25 +65,35 @@ def parse_837(file_name):
         index += 1
         if segments[index][0] == 'PRV':
           index += 1
-        # loading billing provider name
-        if segments[index][0] == 'NM1':
-          billingProvider['NPI'] = segments[index][9]
-          index += 1
-        if segments[index][0] == 'N3':
-          index += 1
-        if segments[index][0] == 'N4':
-          index += 1
-        if segments[index][0] == 'REF':
-          billingProvider['TaxID'] = segments[index][2]
-          index += 1
-        
-        # loading pay to address name
-        if segments[index][0] == 'NM1':
-          index += 1
-        if segments[index][0] == 'N3':
-          index += 1
-        if segments[index][0] == 'N4':
-          index += 1
+        while segments[index][0] == 'NM1':
+          if segments[index][1] == '85': # Billing Provider
+            if segments[index][2] == '2':
+              billingProvider['Type'] = "BUSINESS"
+              billingProvider['Name'] = segments[index][3]
+            elif segments[index][2] == '1':
+              billingProvider['Type'] = "INDIVIDUAL"
+              billingProvider['FirstName'] = segments[index][4]
+              billingProvider['LastName'] = segments[index][3]
+            billingProvider['NPI'] = segments[index][9]
+            index += 1
+            if segments[index][0] == 'N3':
+              billingProvider['AddressLine1'] = segments[index][1]
+              billingProvider['AddressLine2'] = segments[index][2]
+              index += 1
+            if segments[index][0] == 'N4':
+              billingProvider['City'] = segments[index][1]
+              billingProvider['State'] = segments[index][2]
+              billingProvider['ZipCode'] = segments[index][3]
+              index += 1
+            if segments[index][0] == 'REF':
+              billingProvider['TaxID'] = segments[index][2]
+              index += 1
+          elif segments[index][1] == '87': # Pay To Provider
+            index += 1
+            if segments[index][0] == 'N3':
+              index += 1
+            if segments[index][0] == 'N4':
+              index += 1
       # loading subscriber hierarchical level
       if segments[index][0] == 'HL':
         output['Claim'].append({})
@@ -97,6 +126,7 @@ def parse_837(file_name):
         index += 1
       if segments[index][0] == 'NM1':
         if segments[index][2] == '1':
+          # print(output['Claim'])
           output['Claim'][-1]['Patient']['FirstName'] = segments[index][4]
           output['Claim'][-1]['Patient']['MiddleName'] = segments[index][5] if len(segments[index]) > 5 else ''
           output['Claim'][-1]['Patient']['LastName'] = segments[index][3]
@@ -161,8 +191,8 @@ def parse_837(file_name):
       
       # loading claim information
       if segments[index][0] == 'CLM':
-        output['Claim'][-1]['NPI'] = billingProvider['NPI']
-        output['Claim'][-1]['TaxID'] = billingProvider['TaxID']
+        # output['Claim'][-1]['NPI'] = billingProvider['NPI']
+        # output['Claim'][-1]['TaxID'] = billingProvider['TaxID']
         output['Claim'][-1]['PatientAccountNumber'] = segments[index][1]
         output['Claim'][-1]['TotalClaimChargeAmount'] = float(segments[index][2])
         output['Claim'][-1]['AccidentDate'] = '1900-01-01'
@@ -199,6 +229,14 @@ def parse_837(file_name):
           if segments[index][1] == 'DN': # referring provider
             index += 1
           elif segments[index][1] == '82': # rendering provider
+            if segments[index][2] == '1':
+              renderingProvider['Type'] = 'INDIVIDUAL'
+              renderingProvider['FirstName'] = segments[index][4]
+              renderingProvider['LastName'] = segments[index][3]
+            else:
+              renderingProvider['Type'] = 'BUSINESS'
+              renderingProvider['Name'] = segments[index][3]
+            renderingProvider['NPI'] = segments[index][9]
             index += 1
             if segments[index][0] == 'PRV':
               index += 1
@@ -295,6 +333,9 @@ def parse_837(file_name):
       # print(output['Claim'][-1])
       if output['Claim'][-1]['AccidentDate'] == "":
         output['Claim'][-1]['AccidentDate'] = output['Claim'][-1]['ServiceDate']
+      output['Claim'][-1]['BillingProvider'] = billingProvider
+      output['Claim'][-1]['RenderingProvider'] = renderingProvider
+      output['Claim'][-1]['InterpretingProvider'] = interpretingProvider
     
     if segments[index][0] == 'SE':
       # print(segments[index])
