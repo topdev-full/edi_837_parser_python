@@ -8,7 +8,7 @@ import uuid
 mysql_conn = mysql.connector.connect(
   host='localhost',
   user='root',
-  password='',
+  password='password',
   database='db_gabeo'
 )
 
@@ -111,25 +111,28 @@ def add_835(claim):
   mysql_conn.commit()
 
 if __name__ == '__main__':
-  query = "DELETE FROM parsed_837"
-  cursor.execute(query)
+#  query = "DELETE FROM parsed_837"
+#  cursor.execute(query)
   query = "DELETE FROM parsed_835"
   cursor.execute(query)
   mysql_conn.commit()
-  base_dir_837 = "C:/Users/DevOps/Documents/837/"
-  base_dir_835 = "C:/Users/DevOps/Documents/835/"
+  base_dir_837 = "/home/rebound/data/837/"
+  base_dir_835 = "/home/rebound/data/835/"
   claims_837 = []
   claims_835 = []
   index_set_835 = {}
   index_set_837 = {}
-  for file_name in os.listdir(base_dir_837):
-    print(file_name)
-    output = parse_837(base_dir_837+file_name)
-    for claim in output['Claim']:
-      add_837(claim)
+#  for file_name in os.listdir(base_dir_837):
+#    print(file_name)
+#    output = parse_837(base_dir_837+file_name)
+#    for claim in output['Claim']:
+#      add_837(claim)
   for file_name in os.listdir(base_dir_835):
-    print(file_name)
+#    print(file_name)
     output = parse_835(base_dir_835+file_name)
+    index = 0
     for claim in output['Claim']:
+      index += 1
       add_835(claim)
+      print(len(output['Claim']), index)
   
