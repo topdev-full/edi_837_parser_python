@@ -4,12 +4,13 @@ from edi_837 import parse_837
 from edi_835 import parse_835
 import mysql.connector
 import uuid
+from settings import *
 
 mysql_conn = mysql.connector.connect(
-  host='localhost',
-  user='root',
-  password='',
-  database='db_gabeo'
+  host=MYSQL_HOST,
+  user=MYSQL_USER,
+  password=MYSQL_PASSWORD,
+  database=MYSQL_DB
 )
 
 cursor = mysql_conn.cursor()
@@ -151,8 +152,8 @@ if __name__ == '__main__':
   query = f"DELETE FROM rebound_renderingprovider"
   cursor.execute(query)
 
-  base_dir_837 = "C:/Users/DevOps/Documents/837/"
-  base_dir_835 = "C:/Users/DevOps/Documents/835/"
+  # base_dir_837 = "C:/Users/DevOps/Documents/837/"
+  # base_dir_835 = "C:/Users/DevOps/Documents/835/"
   claims_837 = []
   claims_835 = []
   index_set_835 = {}
