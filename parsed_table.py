@@ -163,7 +163,7 @@ def start_add_837():
       add_837(claim, base_dir_837+file_name, index)
       if total == QUERY_SIZE:
         query = query[:len(query)-1]
-        print(query)
+        # print(query)
         cursor.execute(query)
         mysql_conn.commit()
         total = 0
