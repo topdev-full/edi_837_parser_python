@@ -96,8 +96,8 @@ def add_837(claim, filepath, cnt):
   diagnosis = ":".join(claim['Diagnosis'])
   services = ""
   for service in claim['Services']:
-    services += f"{service['ChargeAmount']}|{service['Units']}|{service['ServiceDate']}|{service['SourceID']}|{service['Code']}|{service['Modifier']}:"
-  if len(services) != 0 and services[-1] == ':':
+    services += f"{service['ChargeAmount']}|{service['Units']}|{service['ServiceDate']}|{service['SourceID']}|{service['Code']}|{service['Modifier']},"
+  if len(services) != 0 and services[-1] == ',':
     services = services[:len(services)-1]
   query += f"""(
     "{id}",
