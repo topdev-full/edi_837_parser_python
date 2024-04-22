@@ -239,6 +239,7 @@ if __name__ == '__main__':
     id = str(uuid.uuid4())
     service_value = ""
     for service in result['Services'].split(','):
+      print(service)
       service_item = service.split('|')
       service_value += f"{service_item[4]}:{service_item[5]}:{service_item[0]}:{service_item[0]}::"
     claim_query += f"""(
