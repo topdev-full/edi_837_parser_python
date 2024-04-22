@@ -112,36 +112,36 @@ if __name__ == '__main__':
           paymentamount = float(adjustments[3])
           remark = adjustments[-1]
           for adj in adjustments[-2].split('#'):
-          codes = adj.split('@')
-          if len(codes) == 2:
-            code = ''
-            groupcode = ''
-            if codes[0][0].isalpha() == True and codes[0][1].isalpha() == True:
-              code = codes[0][2:]
-              groupcode = codes[0][:2]
-            else:
-              code = codes[0]
+            codes = adj.split('@')
+            if len(codes) == 2:
+              code = ''
               groupcode = ''
-            if maxCode == "Not Set":
-              maxCode = code
-            elif maxAmount < float(codes[1]):
-              qq = f"SELECT * FROM carc WHERE Code='{code}'"
-              cursor.execute(qq)
-              res = cursor.fetchone()
-              maxAmount = float(codes[1])
-              if res == None:
-                maxCode = ''
-                category = 'Not set yet'
+              if codes[0][0].isalpha() == True and codes[0][1].isalpha() == True:
+                code = codes[0][2:]
+                groupcode = codes[0][:2]
               else:
-                maxCode = res['Code']
-                category = res['DenialCategory']
-            adjustment_query += f"""(
-              "{str(uuid.uuid4())}",
-              "{service_id}",
-              "{groupcode}",
-              "{code}",
-              {float(codes[1])}
-            ),"""
+                code = codes[0]
+                groupcode = ''
+              if maxCode == "Not Set":
+                maxCode = code
+              elif maxAmount < float(codes[1]):
+                qq = f"SELECT * FROM carc WHERE Code='{code}'"
+                cursor.execute(qq)
+                res = cursor.fetchone()
+                maxAmount = float(codes[1])
+                if res == None:
+                  maxCode = ''
+                  category = 'Not set yet'
+                else:
+                  maxCode = res['Code']
+                  category = res['DenialCategory']
+              adjustment_query += f"""(
+                "{str(uuid.uuid4())}",
+                "{service_id}",
+                "{groupcode}",
+                "{code}",
+                {float(codes[1])}
+              ),"""
 
         paymentamount = 0
         remark = ""
