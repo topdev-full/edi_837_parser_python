@@ -86,9 +86,8 @@ if __name__ == '__main__':
     results = cursor.fetchall()
 
     for result in results:
-      ids.append(result["id_837"])
       matching_query += f"""("{str(uuid.uuid4())}", "{result["id_835"]}", "{result["id_837"]}"),"""
-      id = result['id_837']
+      id = str(uuid.uuid4())
       diagnosis = result['Diagnosis'].split(':')
       for diag in diagnosis:
         diagnosis_query += f"""(
@@ -163,6 +162,7 @@ if __name__ == '__main__':
 
       claim_query += f"""(
         "{id}",
+        "{result['id_837']}",
         "{result["PatientFirstName"]}",
         "{result["PatientLastName"]}",
         "{result["PatientMiddleName"]}",
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     offset += PERIOD_SIZE
     print(offset)
 
-  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN (SELECT id FROM rebound_claim)"""
+  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN (SELECT id_837 FROM rebound_claim)"""
   cnt = 0
   cursor.execute(query)
   results = cursor.fetchall()
