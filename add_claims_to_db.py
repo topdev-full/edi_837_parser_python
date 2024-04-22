@@ -11,11 +11,13 @@ mysql_conn = mysql.connector.connect(
 
 cursor = mysql_conn.cursor(dictionary=True)
 
-matching_query = "INSERT INTO maching_837_835 VALUES "
+matching_query = "INSERT INTO matching_837_835 VALUES "
 claim_query = "INSERT INTO rebound_claim VALUES "
 service_query = "INSERT INTO rebound_service VALUES "
 diagnosis_query = "INSERT INTO rebound_diagnosis VALUES "
 adjustment_query = "INSERT INTO rebound_adjustment VALUES "
+ids = []
+total_cnt = 0
 
 if __name__ == '__main__':
   query = "SELECT COUNT(id) AS CNT FROM parsed_835"
@@ -40,6 +42,7 @@ if __name__ == '__main__':
       parsed_837.PatientZipCode,
       parsed_837.PatientBirthday,
       parsed_837.PatientGender,
+      parsed_837.PatientSSN,
       parsed_837.PayerName,
       parsed_837.PayerID,
       parsed_837.PayerAddress,
@@ -83,7 +86,8 @@ if __name__ == '__main__':
     results = cursor.fetchall()
 
     for result in results:
-      matching_query += f"('{result['id_835']}', '{result['id_837']}'),"
+      ids.append(result["id_837"])
+      matching_query += f"""("{str(uuid.uuid4())}", "{result["id_835"]}", "{result["id_837"]}"),"""
       id = str(uuid.uuid4())
       diagnosis = result['Diagnosis'].split(':')
       for diag in diagnosis:
@@ -106,22 +110,31 @@ if __name__ == '__main__':
         remark = adjustments[-1]
         for adj in adjustments[-2].split('#'):
           codes = adj.split('@')
-          if maxCode == "Not Set":
-            maxCode = codes[0][2:]
-          elif maxAmount < float(codes[1]):
-            qq = f"SELECT * FROM carc WHERE Code='{codes[0][2:]}'"
-            cursor.execute(qq)
-            res = cursor.fetchone()
-            maxAmount = float(codes[1])
-            maxCode = res[0]
-            category = res[2]
-          adjustment_query += f"""(
-            "{str(uuid.uuid4())}",
-            "{service_id}",
-            "{codes[0][:2]}",
-            "{codes[0][2:]}",
-            {float(codes[1])}
-          ),"""
+          if len(codes) == 2:
+            code = ''
+            groupcode = ''
+            if codes[0][0].isalpha() == True and codes[0][1].isalpha() == True:
+              code = codes[0][2:]
+              groupcode = codes[0][:2]
+            else:
+              code = codes[0]
+              groupcode = ''
+            if maxCode == "Not Set":
+              maxCode = code
+            elif maxAmount < float(codes[1]):
+              qq = f"SELECT * FROM carc WHERE Code='{code}'"
+              cursor.execute(qq)
+              res = cursor.fetchone()
+              maxAmount = float(codes[1])
+              maxCode = res['Code']
+              category = res['DenialCategory']
+            adjustment_query += f"""(
+              "{str(uuid.uuid4())}",
+              "{service_id}",
+              "{groupcode}",
+              "{code}",
+              {float(codes[1])}
+            ),"""
 
         paymentamount = 0
         remark = ""
@@ -129,14 +142,14 @@ if __name__ == '__main__':
         service_query += f"""(
           "{service_id}",
           "{id}",
-          "{services[0]}",
-          "{services[1]}",
+          {float(services[0])},
+          {int(services[1])},
           "{services[2]}",
           "{services[3]}",
           "{services[4]}",
           "{services[5]}",
           {paymentamount},
-          "{remark}",
+          "{remark}"
         ),"""
 
       if category == "":
@@ -204,10 +217,83 @@ if __name__ == '__main__':
     cursor.execute(diagnosis_query)
     cursor.execute(adjustment_query)
     mysql_conn.commit()
-    matching_query = "INSERT INTO maching_837_835 VALUES "
+    matching_query = "INSERT INTO matching_837_835 VALUES "
     claim_query = "INSERT INTO rebound_claim VALUES "
     service_query = "INSERT INTO rebound_service VALUES "
     diagnosis_query = "INSERT INTO rebound_diagnosis VALUES "
     adjustment_query = "INSERT INTO rebound_adjustment VALUES "
     offset += PERIOD_SIZE
     print(offset)
+    break
+
+  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN ({"'" + "','".join(ids) + "'"})"""
+  cnt = 0
+  cursor.execute(query)
+  results = cursor.fetchall()
+  for result in results:
+    id = str(uuid.uuid4())
+    service_value = ""
+    for service in result['Services'].split(','):
+      service_item = service.split('|')
+      service_value += f"{service_item[4]}:{service_item[5]}:{service_item[0]}:{service_item[0]}::"
+    claim_query += f"""(
+      "{id}",
+      "{result["PatientFirstName"]}",
+      "{result["PatientLastName"]}",
+      "{result["PatientMiddleName"]}",
+      "{result["PatientAddress"]}",
+      "{result["PatientCity"]}",
+      "{result["PatientState"]}",
+      "{result["PatientZipCode"]}",
+      "{result["PatientBirthday"]}",
+      "{result["PatientGender"]}",
+      "{result["PatientSSN"]}",
+      "{result["PayerName"]}",
+      "{result["PayerID"]}",
+      "{result["PayerAddress"]}",
+      "{result["PayerCity"]}",
+      "{result["PayerState"]}",
+      "{result["PayerZipCode"]}",
+      "{result["PatientAccountNumber"]}",
+      "{result["TotalClaimChargeAmount"]}",
+      "{result["AccidentDate"]}",
+      "{result["ServiceDate"]}",
+      "{result["MedicalRecordNumber"]}",
+      "ACTIVE",
+      "NONE",
+      "",
+      "{result["AuthNumber"]}",
+      "Review",
+      "{result["RenderingProviderType"]}",
+      "{result["RenderingProviderFirstName"]}",
+      "{result["RenderingProviderLastName"]}",
+      "{result["RenderingProviderName"]}",
+      "{result["RenderingProviderNPI"]}",
+      "{result["BillingProviderType"]}",
+      "{result["BillingProviderFirstName"]}",
+      "{result["BillingProviderLastName"]}",
+      "{result["BillingProviderAddressLine1"]}",
+      "{result["BillingProviderAddressLine1"]}",
+      "{result["BillingProviderCity"]}",
+      "{result["BillingProviderState"]}",
+      "{result["BillingProviderZipCode"]}",
+      "{result["BillingProviderNPI"]}",
+      "{result["BillingProviderTaxID"]}",
+      "{service_value}",
+      "{result['Diagnosis']}"
+    ),"""
+    cnt += 1
+    if cnt == QUERY_SIZE:
+      total_cnt += cnt
+      print(total_cnt)
+      cnt = 0
+      if claim_query[-1] == ',':
+        claim_query = claim_query[:len(claim_query)-1]
+      cursor.execute(claim_query)
+      mysql_conn.commit()
+      claim_query = "INSERT INTO rebound_claim VALUES "
+  if cnt != 0:
+    if claim_query[-1] == ',':
+      claim_query = claim_query[:len(claim_query)-1]
+    cursor.execute(claim_query)
+    mysql_conn.commit()
