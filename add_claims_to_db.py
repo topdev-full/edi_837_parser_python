@@ -25,7 +25,7 @@ if __name__ == '__main__':
   result = cursor.fetchone()
   count = result['CNT']
   period = int((count - 1) / PERIOD_SIZE) + 1
-  offset = 239000
+  offset = 277000
   while offset < count:
     query = f"CREATE OR REPLACE VIEW temp_835 AS SELECT * FROM parsed_835 LIMIT {PERIOD_SIZE} OFFSET {offset}"
     cursor.execute(query)
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     offset += PERIOD_SIZE
     print(offset)
 
-  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN (SELECT id FROM reboound_claim)"""
+  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN (SELECT id FROM rebound_claim)"""
   cnt = 0
   cursor.execute(query)
   results = cursor.fetchall()
