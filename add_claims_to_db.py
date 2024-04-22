@@ -107,10 +107,11 @@ if __name__ == '__main__':
         service_id = str(uuid.uuid4())
         services = services_837[i].split('|')
 
-        adjustments = services_835[i].split(':')
-        paymentamount = float(adjustments[3])
-        remark = adjustments[-1]
-        for adj in adjustments[-2].split('#'):
+        if i < len(services_835):
+          adjustments = services_835[i].split(':')
+          paymentamount = float(adjustments[3])
+          remark = adjustments[-1]
+          for adj in adjustments[-2].split('#'):
           codes = adj.split('@')
           if len(codes) == 2:
             code = ''
