@@ -26,7 +26,7 @@ if __name__ == '__main__':
   count = result['CNT']
   period = int((count - 1) / PERIOD_SIZE) + 1
   offset = 0
-  for i in range(period):
+  while offset < count:
     query = f"CREATE OR REPLACE VIEW temp_835 AS SELECT * FROM parsed_835 LIMIT {PERIOD_SIZE} OFFSET {offset}"
     cursor.execute(query)
 
@@ -107,6 +107,7 @@ if __name__ == '__main__':
 
         if i < len(services_835):
           adjustments = services_835[i].split(':')
+          print(adjustments)
           paymentamount = float(adjustments[3])
           remark = adjustments[-1]
           for adj in adjustments[-2].split('#'):
