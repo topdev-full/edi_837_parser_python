@@ -127,8 +127,12 @@ if __name__ == '__main__':
               cursor.execute(qq)
               res = cursor.fetchone()
               maxAmount = float(codes[1])
-              maxCode = res['Code']
-              category = res['DenialCategory']
+              if res == None:
+                maxCode = ''
+                category = 'Not set yet'
+              else:
+                maxCode = res['Code']
+                category = res['DenialCategory']
             adjustment_query += f"""(
               "{str(uuid.uuid4())}",
               "{service_id}",
