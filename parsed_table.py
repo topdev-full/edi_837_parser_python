@@ -34,7 +34,7 @@ def add_835(claim, filepath, cnt):
     else:
       services += ":"
     services += f"{service['Remark']},"
-  if services[-1] == ',':
+  if len(services) != 0 and services[-1] == ',':
     services = services[:len(services)-1]
   # print(services)
   query += f"""(
@@ -97,7 +97,7 @@ def add_837(claim, filepath, cnt):
   services = ""
   for service in claim['Services']:
     services += f"{service['ChargeAmount']}|{service['Units']}|{service['ServiceDate']}|{service['SourceID']}|{service['Code']}|{service['Modifier']}:"
-  if services[-1] == ':':
+  if len(services) != 0 and services[-1] == ':':
     services = services[:len(services)-1]
   query += f"""(
     "{id}",
