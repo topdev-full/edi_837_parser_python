@@ -101,6 +101,8 @@ if __name__ == '__main__':
       maxCode = "Not Set"
       maxAmount = 0
       category = ""
+      print(services_837)
+      print(services_835)
       for i in range(len(services_837)):
         service_id = str(uuid.uuid4())
         services = services_837[i].split('|')
