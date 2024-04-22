@@ -123,6 +123,7 @@ if __name__ == '__main__':
               maxCode = code
             elif maxAmount < float(codes[1]):
               qq = f"SELECT * FROM carc WHERE Code='{code}'"
+              print(qq)
               cursor.execute(qq)
               res = cursor.fetchone()
               maxAmount = float(codes[1])
