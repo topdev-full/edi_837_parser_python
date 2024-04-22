@@ -230,7 +230,7 @@ if __name__ == '__main__':
     offset += PERIOD_SIZE
     print(offset)
 
-  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN ({"'" + "','".join(ids) + "'"})"""
+  query = f"""SELECT * FROM parsed_837 WHERE id NOT IN (SELECT id FROM reboound_claim)"""
   cnt = 0
   cursor.execute(query)
   results = cursor.fetchall()
