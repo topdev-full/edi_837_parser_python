@@ -25,7 +25,7 @@ if __name__ == '__main__':
   result = cursor.fetchone()
   count = result['CNT']
   period = int((count - 1) / PERIOD_SIZE) + 1
-  offset = 277000
+  offset = 0
   while offset < count:
     query = f"CREATE OR REPLACE VIEW temp_835 AS SELECT * FROM parsed_835 LIMIT {PERIOD_SIZE} OFFSET {offset}"
     cursor.execute(query)
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     for result in results:
       ids.append(result["id_837"])
       matching_query += f"""("{str(uuid.uuid4())}", "{result["id_835"]}", "{result["id_837"]}"),"""
-      id = str(uuid.uuid4())
+      id = result['id_837']
       diagnosis = result['Diagnosis'].split(':')
       for diag in diagnosis:
         diagnosis_query += f"""(
