@@ -88,8 +88,15 @@ def parse_835(file_name):
         output['Claim'][-1]['TotalClaimChargeAmount'] = float(segments[index][3])
         output['Claim'][-1]['ClaimPaymentAmount'] = float(segments[index][4])
         output['Claim'][-1]['ServiceDate'] = None
-        output['Claim'][-1]['Payer'] = payer
-        output['Claim'][-1]['Payee'] = payee
+        output['Claim'][-1]['Payer'] = output['Claim'][-1]['Payee'] = {}
+        output['Claim'][-1]['Payer']['Name'] = payer['Name'] if "Name" in payer else None
+        output['Claim'][-1]['Payer']['Address'] = payer['Address'] if "Address" in payer else None
+        output['Claim'][-1]['Payer']['City'] = payer['City'] if "City" in payer else None
+        output['Claim'][-1]['Payer']['State'] = payer['State'] if "State" in payer else None
+        output['Claim'][-1]['Payer']['ZipCode'] = payer['ZipCode'] if "ZipCode" in payer else None
+        output['Claim'][-1]['Payee']['Name'] = payee['Name'] if "Name" in payee else None
+        output['Claim'][-1]['Payee']['NPI'] = payee['NPI'] if "NPI" in payee else None
+        output['Claim'][-1]['Payee']['TaxID'] = payee['TaxID'] if "TaxID" in payee else None
         index += 1
         while segments[index][0] == 'CAS':
           index += 1

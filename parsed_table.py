@@ -15,125 +15,166 @@ mysql_conn = mysql.connector.connect(
 
 cursor = mysql_conn.cursor()
 
-def check_patient(patient):
-  query = f"""SELECT * FROM rebound_patient WHERE FirstName='{patient['FirstName']}' AND LastName="{patient['LastName']}" AND MiddleName='{patient['MiddleName']}' AND Address='{patient['Address']}' AND City="{patient['City']}" AND State='{patient['State']}' AND ZipCode='{patient['ZipCode']}' AND Birthday='{patient['Birthday']}' AND Gender='{patient['Gender']}' AND SSN='{patient['SSN']}'"""
-  print(query)
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if len(result) == 0:
-    id = str(uuid.uuid4())
-    query = f"INSERT INTO rebound_patient(id, FirstName, LastName, MiddleName, Address, City, State, ZipCode, Birthday, Gender, SSN) VALUES('{id}', '{patient['FirstName']}', '{patient['LastName']}', '{patient['MiddleName']}', '{patient['Address']}', '{patient['City']}', '{patient['State']}', '{patient['ZipCode']}', '{patient['Birthday']}', '{patient['Gender']}', '{patient['SSN']}')"
-    cursor.execute(query)
-    return id
-  else:
-    return result[0][0]
+query = ""
+total = 0
 
-def check_payer(payer):
-  query = f"SELECT * FROM rebound_payer WHERE Name='{payer['Name']}' AND Payer_ID='{payer['ID']}' AND Address='{payer['Address']}' AND City='{payer['City']}' AND State='{payer['State']}' AND ZipCode='{payer['ZipCode']}'"
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if len(result) == 0:
-    id = str(uuid.uuid4())
-    query = f"INSERT INTO rebound_payer(id, Name, Payer_ID, Address, City, State, ZipCode) VALUES('{id}', '{payer['Name']}', '{payer['ID']}', '{payer['Address']}', '{payer['City']}', '{payer['State']}', '{payer['ZipCode']}')"
-    cursor.execute(query)
-    return id
-  else:
-    return result[0][0]
-
-def check_billingprovider(billingprovider):
-  query = f"SELECT * FROM rebound_billingprovider WHERE Type='{billingprovider['Type']}' AND Name='{billingprovider['Name']}' AND FirstName='{billingprovider['FirstName']}' AND LastName='{billingprovider['LastName']}' AND AddressLine1='{billingprovider['AddressLine1']}' AND AddressLine2='{billingprovider['AddressLine2']}' AND City='{billingprovider['City']}' AND State='{billingprovider['State']}' AND ZipCode='{billingprovider['ZipCode']}' AND NPI='{billingprovider['NPI']}' AND TaxID='{billingprovider['TaxID']}'"
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if len(result) == 0:
-    billingprovider_uuid = str(uuid.uuid4())
-    query = f"INSERT INTO rebound_billingprovider(id, Type, Name, FirstName, LastName, AddressLine1, AddressLine2, City, State, ZipCode, NPI, TaxID) VALUES('{billingprovider_uuid}', '{billingprovider['Type']}', '{billingprovider['Name']}', '{billingprovider['FirstName']}', '{billingprovider['LastName']}', '{billingprovider['AddressLine1']}', '{billingprovider['AddressLine2']}', '{billingprovider['City']}', '{billingprovider['State']}', '{billingprovider['ZipCode']}', '{billingprovider['NPI']}', '{billingprovider['TaxID']}')"
-    cursor.execute(query)
-    return billingprovider_uuid
-  else:
-    return result[0][0]
-
-def check_renderingprovider(renderingprovider):
-  query = f"SELECT * FROM rebound_renderingprovider WHERE Type='{renderingprovider['Type']}' AND FirstName='{renderingprovider['FirstName']}' AND LastName='{renderingprovider['LastName']}' AND Name='{renderingprovider['Name']}' AND NPI='{renderingprovider['NPI']}'"
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if len(result) == 0:
-    renderingprovider_uuid = str(uuid.uuid4())
-    query = f"INSERT INTO rebound_renderingprovider(id, Type, FirstName, LastName, Name, NPI) VALUES('{renderingprovider_uuid}', '{renderingprovider['Type']}', '{renderingprovider['FirstName']}', '{renderingprovider['LastName']}', '{renderingprovider['Name']}', '{renderingprovider['NPI']}')"
-    cursor.execute(query)
-    return renderingprovider_uuid
-  else:
-    return result[0][0]
-
-
-def add_837(claim):
-  print(claim)
-  patient_id = check_patient(claim['Patient'])
-  payer_id = check_payer(claim['Payer'])
-  billingprovider_id = check_billingprovider(claim['BillingProvider'])
-  renderingprovider_id = check_renderingprovider(claim['RenderingProvider'])
+def add_835(claim, filepath, cnt):
+  print("835", filepath, cnt)
+  global query
+  global total
+  # print(claim)
   id = str(uuid.uuid4())
-  diagnosis = ",".join(claim['Diagnosis'])
-  services = ""
-  for service in claim['Services']:
-    if services != "":
-      services += ","
-    services += service['Code']
-  query = f"INSERT INTO parsed_837(id, Patient, Payer, Diagnosis, Services, PatientAccountNumber, TotalClaimChargeAmount, AccidentDate, ServiceDate, MedicalRecordNumber, AuthNumber, BillingProvider, RenderingProvider) VALUES('{id}', '{patient_id}', '{payer_id}', '{diagnosis}', '{services}', '{claim['PatientAccountNumber']}', '{claim['TotalClaimChargeAmount']}', '{claim['AccidentDate']}', '{claim['ServiceDate']}', '{claim['MedicalRecordNumber']}', '{claim['AuthNumber']}', '{billingprovider_id}', '{renderingprovider_id}')"
-  cursor.execute(query)
-  mysql_conn.commit()
-
-def check_payee(payee):
-  query = f"SELECT * FROM rebound_payee WHERE Name='{payee['Name']}' AND NPI='{payee['NPI']}'"
-  cursor.execute(query)
-  result = cursor.fetchall()
-  if len(result) == 0:
-    payee_id = str(uuid.uuid4())
-    query = f"INSERT INTO rebound_payee(id, Name, NPI) VALUES('{payee_id}', '{payee['Name']}', '{payee['NPI']}')"
-    cursor.execute(query)
-    return payee_id
-  else:
-    return result[0][0]
-
-def add_835(claim):
-  print(claim)
   services = ""
   for service in claim['Service']:
-    services += service['Code'] + ":["
+    services += f"{service['Code']}:{service['Modifier']}:{service['ChargeAmount']}:{service['PayAmount']}:"
     for carc in service['CARC']:
-      if services[-1] != '[':
-        services += ","
-      services += carc['GroupCode']+carc['Code']
-    services += "],"
-  services = services[:len(services)-1]
-  payee_id = check_payee(claim['Payee'])
-  id = str(uuid.uuid4())
-  query = f"INSERT INTO parsed_835(id, TaxID, Service, NPI, PatientControlNumber, TotalClaimChargeNumber, ClaimPaymentAmount, ServiceDate, Payee) VALUES('{id}', '{claim['TaxID']}', '{services}', '{claim['NPI']}', '{claim['PatientControlNumber']}', '{claim['TotalClaimChargeAmount']}', '{claim['ClaimPaymentAmount']}', '{claim['ServiceDate']}', '{payee_id}')"
-  cursor.execute(query)
-  mysql_conn.commit()
+      services += f"{carc['GroupCode']}{carc['Code']}@{carc['Amount']}#"
+    if services[-1] == '#':
+      services = services[:len(services)-1] + ":"
+    else:
+      services += ":"
+    services += f"{service['Remark']},"
+  if services[-1] == ',':
+    services = services[:len(services)-1]
+  # print(services)
+  query += f"""(
+    "{id}",
+    "{claim["TaxID"]}",
+    "{services}",
+    "{claim["NPI"]}",
+    "{claim["PatientControlNumber"]}",
+    {claim["TotalClaimChargeAmount"]},
+    {claim["ClaimPaymentAmount"]},
+    "{claim["ServiceDate"]}",
+    "{claim["Payee"]["Name"]}",
+    "{claim["Payee"]["NPI"]}",
+    "{claim["Payee"]["TaxID"]}",
+    "{claim["Payer"]["Name"]}",
+    "{claim["Payer"]["Address"]}",
+    "{claim["Payer"]["City"]}",
+    "{claim["Payer"]["State"]}",
+    "{claim["Payer"]["ZipCode"]}",
+    "{filepath}",
+    {cnt}
+  ),"""
+  total += 1
 
-if __name__ == '__main__':
-#  query = "DELETE FROM parsed_837"
-#  cursor.execute(query)
-  query = "DELETE FROM parsed_835"
-  cursor.execute(query)
+def start_add_835():
+  q = "INSERT INTO parsed_835_all SELECT * FROM parsed_835"
+  cursor.execute(q)
+  q = "DELETE FROM parsed_835"
+  cursor.execute(q)
   mysql_conn.commit()
-  # base_dir_837 = "C:/Users/DevOps/Documents/837/"
-  # base_dir_835 = "C:/Users/DevOps/Documents/835/"
-  claims_837 = []
-  claims_835 = []
-  index_set_835 = {}
-  index_set_837 = {}
-#  for file_name in os.listdir(base_dir_837):
-#    print(file_name)
-#    output = parse_837(base_dir_837+file_name)
-#    for claim in output['Claim']:
-#      add_837(claim)
+  global query
+  global total
+  total = 0
+  query = "INSERT INTO parsed_835 VALUES "
   for file_name in os.listdir(base_dir_835):
-#    print(file_name)
     output = parse_835(base_dir_835+file_name)
     index = 0
     for claim in output['Claim']:
       index += 1
-      add_835(claim)
-      print(len(output['Claim']), index)
-  
+      add_835(claim, base_dir_835+file_name, index)
+      if total == QUERY_SIZE:
+        query = query[:len(query)-1]
+        cursor.execute(query)
+        mysql_conn.commit()
+        total = 0
+        query = "INSERT INTO parsed_835 VALUES "
+  if query[-1] == ',':
+    query = query[:len(query)-1]
+    cursor.execute(query)
+    mysql_conn.commit()
+    total = 0
+    query = "INSERT INTO parsed_835 VALUES "
+
+def add_837(claim, filepath, cnt):
+  print("837", filepath, cnt)
+  global query
+  global total
+  id = str(uuid.uuid4())
+  diagnosis = ":".join(claim['Diagnosis'])
+  services = ""
+  for service in claim['Services']:
+    services += f"{service['ChargeAmount']}|{service['Units']}|{service['ServiceDate']}|{service['SourceID']}|{service['Code']}|{service['Modifier']}:"
+  if services[-1] == ':':
+    services = services[:len(services)-1]
+  query += f"""(
+    "{id}",
+    "{claim["Patient"]["FirstName"]}",
+    "{claim["Patient"]["LastName"]}",
+    "{claim["Patient"]["MiddleName"]}",
+    "{claim["Patient"]["Address"]}",
+    "{claim["Patient"]["City"]}",
+    "{claim["Patient"]["State"]}",
+    "{claim["Patient"]["ZipCode"]}",
+    "{claim["Patient"]["Birthday"]}",
+    "{claim["Patient"]["Gender"]}",
+    "{claim["Patient"]["SSN"]}",
+    "{claim["Payer"]["Name"]}",
+    "{claim["Payer"]["ID"]}",
+    "{claim["Payer"]["Address"]}",
+    "{claim["Payer"]["City"]}",
+    "{claim["Payer"]["State"]}",
+    "{claim["Payer"]["ZipCode"]}",
+    "{diagnosis}",
+    "{services}",
+    "{claim["PatientAccountNumber"]}",
+    {claim["TotalClaimChargeAmount"]},
+    "{claim["AccidentDate"]}",
+    "{claim["ServiceDate"]}",
+    "{claim["MedicalRecordNumber"]}",
+    "{claim["AuthNumber"]}",
+    "{claim["RenderingProvider"]["Type"]}",
+    "{claim["RenderingProvider"]["FirstName"]}",
+    "{claim["RenderingProvider"]["LastName"]}",
+    "{claim["RenderingProvider"]["Name"]}",
+    "{claim["RenderingProvider"]["NPI"]}",
+    "{claim["BillingProvider"]["Type"]}",
+    "{claim["BillingProvider"]["FirstName"]}",
+    "{claim["BillingProvider"]["LastName"]}",
+    "{claim["BillingProvider"]["AddressLine1"]}",
+    "{claim["BillingProvider"]["AddressLine2"]}",
+    "{claim["BillingProvider"]["City"]}",
+    "{claim["BillingProvider"]["State"]}",
+    "{claim["BillingProvider"]["ZipCode"]}",
+    "{claim["BillingProvider"]["NPI"]}",
+    "{claim["BillingProvider"]["TaxID"]}",
+    "{filepath}",
+    {cnt}
+  ),"""
+  total += 1
+
+def start_add_837():
+  q = "INSERT INTO parsed_837_all SELECT * FROM parsed_837"
+  cursor.execute(q)
+  q = "DELETE FROM parsed_837"
+  cursor.execute(q)
+  mysql_conn.commit()
+  global query
+  global total
+  total = 0
+  query = "INSERT INTO parsed_837 VALUES "
+  for file_name in os.listdir(base_dir_837):
+    output = parse_837(base_dir_837+file_name)
+    index = 0
+    for claim in output['Claim']:
+      index += 1
+      add_837(claim, base_dir_837+file_name, index)
+      if total == QUERY_SIZE:
+        query = query[:len(query)-1]
+        print(query)
+        cursor.execute(query)
+        mysql_conn.commit()
+        total = 0
+        query = "INSERT INTO parsed_837 VALUES "
+  if query[-1] == ',':
+    query = query[:len(query)-1]
+    cursor.execute(query)
+    mysql_conn.commit()
+    total = 0
+    query = "INSERT INTO parsed_837 VALUES "
+
+if __name__ == '__main__':
+  start_add_837()
+  start_add_835()
