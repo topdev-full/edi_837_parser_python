@@ -121,19 +121,13 @@ if __name__ == '__main__':
                 else:
                   code = codes[0]
                   groupcode = ''
-                if maxCode == "Not Set":
+                qq = f"SELECT * FROM carc WHERE Code='{code}'"
+                cursor.execute(qq)
+                res = cursor.fetchone()
+                if maxAmount < float(codes[1]) or maxCode == "Not Set":
                   maxCode = code
-                elif maxAmount < float(codes[1]):
-                  qq = f"SELECT * FROM carc WHERE Code='{code}'"
-                  cursor.execute(qq)
-                  res = cursor.fetchone()
                   maxAmount = float(codes[1])
-                  if res == None:
-                    maxCode = ''
-                    category = 'Not set yet'
-                  else:
-                    maxCode = res['Code']
-                    category = res['DenialCategory']
+                  category = res['DenialCategory'] if res != None else ''
                 adjustment_query += f"""(
                   "{str(uuid.uuid4())}",
                   "{service_id}",
