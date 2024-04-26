@@ -86,7 +86,7 @@ if __name__ == '__main__':
     results = cursor.fetchall()
 
     for result in results:
-      matching_query += f"""("{str(uuid.uuid4())}", "{result["id_835"]}", "{result["id_837"]}"),"""
+      matching_query += f"""("{str(uuid.uuid4())}", "{result["id_837"]}", "{result['id_835']}"),"""
       id = str(uuid.uuid4())
       diagnosis = result['Diagnosis'].split(':')
       for diag in diagnosis:
