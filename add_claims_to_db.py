@@ -103,7 +103,7 @@ if __name__ == '__main__':
       for i in range(len(services_837)):
         service_id = str(uuid.uuid4())
         services = services_837[i].split('|')
-
+        remark = ""
         paymentamount = 0
         if i < len(services_835):
           adjustments = services_835[i].split(':')
@@ -135,8 +135,6 @@ if __name__ == '__main__':
                   "{code}",
                   {float(codes[1])}
                 ),"""
-
-        remark = ""
 
         service_query += f"""(
           "{service_id}",
