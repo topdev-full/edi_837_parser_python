@@ -362,7 +362,8 @@ def parse_837(file_name):
             else:
               output['Claim'][-1]['ServiceFacility']['Type'] = 'BUSINESS'
               output['Claim'][-1]['ServiceFacility']['Name'] = segments[index][3]
-            output['Claim'][-1]['ServiceFacility']['NPI'] = segments[index][9]
+            if len(segments[index]) > 9:
+              output['Claim'][-1]['ServiceFacility']['NPI'] = segments[index][9]
             index += 1
             if segments[index][0] == 'N3':
               output['Claim'][-1]['ServiceFacility']['Address1'] = segments[index][1]
