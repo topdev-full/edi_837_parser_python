@@ -215,7 +215,7 @@ def add_837(claim, filepath, cnt):
     "{claim['ReferringProvider']['FirstName']}",
     "{claim['ReferringProvider']['LastName']}",
     "{claim['ReferringProvider']['NPI']}",
-    "{claim['PatientAccoutnNumber']}",
+    "{claim['PatientAccountNumber']}",
     {claim['TotalClaimChargeAmount']},
     "{claim['AccidentDate']}",
     "{claim['ServiceDate']}",
