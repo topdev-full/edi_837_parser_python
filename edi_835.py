@@ -84,14 +84,13 @@ def parse_835(file_name):
             payer['ID'] = segments[index][2]
           index += 1
         while segments[index][0] == 'PER':
-          if segments[index][1] == 'CX':
+          if len(segments[index]) > 2 and segments[index][1] == 'CX':
             payer['ContactName'] = segments[index][2]
+          elif len(segments[index]) > 2 and segments[index][1] == 'BL':
             pass
-          elif segments[index][1] == 'BL':
-            pass
-          if segments[index][3] == 'TE':
+          if len(segments[index]) > 4 and segments[index][3] == 'TE':
             payer['ContactNumber'] = segments[index][4]
-          elif segments[index][3] == 'UR':
+          elif len(segments[index]) > 4 and segments[index][3] == 'UR':
             pass
           index += 1
       elif segments[index][1] == 'PE':
