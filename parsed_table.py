@@ -39,29 +39,71 @@ def add_835(claim, filepath, cnt):
   # print(services)
   query += f"""(
     "{id}",
-    "{claim["TaxID"]}",
+    "{claim['Patient']['Type']}",
+    "{claim['Patient']['Name']}",
+    "{claim['Patient']['FirstName']}",
+    "{claim['Patient']['LastName']}",
+    "{claim['Patient']['MiddleName']}",
+    "{claim['Patient']['IDType']}",
+    "{claim['Patient']['NPI']}",
+    "{claim['Patient']['MemberID']}",
+    "{claim['InsuredSubscriber']['Type']}",
+    "{claim['InsuredSubscriber']['Name']}",
+    "{claim['InsuredSubscriber']['FirstName']}",
+    "{claim['InsuredSubscriber']['LastName']}",
+    "{claim['InsuredSubscriber']['MiddleName']}",
+    "{claim['InsuredSubscriber']['IDType']}",
+    "{claim['InsuredSubscriber']['NPI']}",
+    "{claim['InsuredSubscriber']['MemberID']}",
+    "{claim['RenderingProvider']['Type']}",
+    "{claim['RenderingProvider']['Name']}",
+    "{claim['RenderingProvider']['FirstName']}",
+    "{claim['RenderingProvider']['LastName']}",
+    "{claim['RenderingProvider']['MiddleName']}",
+    "{claim['RenderingProvider']['IDType']}",
+    "{claim['RenderingProvider']['NPI']}",
+    "{claim['RenderingProvider']['MemberID']}",
+    "{claim['PayerClaimControlNumber']}",
+    "{claim['PatientControlNumber']}",
+    {claim['TotalClaimChargeAmount']},
+    {claim['ClaimPaymentAmount']},
+    {claim['PatientResponsibilityAmount']},
+    "{claim['ProductionDate']}",
+    "{claim['PaymentDate']}",
+    "{claim['TrackNumber']}",
+    "{claim['PayerIdentifier']}",
+    "{claim['Payer']['Name']}",
+    "{claim['Payer']['Address']}",
+    "{claim['Payer']['City']}",
+    "{claim['Payer']['State']}",
+    "{claim['Payer']['ZipCode']}",
+    "{claim['Payer']['ID']}",
+    "{claim['Payer']['ContactName']}",
+    "{claim['Payer']['ContactNumber']}",
+    "{claim['Payee']['Name']}",
+    "{claim['Payee']['IDType']}",
+    "{claim['Payee']['NPI']}",
+    "{claim['Payee']['MemberID']}",
+    "{claim['Payee']['Address']}",
+    "{claim['Payee']['City']}",
+    "{claim['Payee']['State']}",
+    "{claim['Payee']['ZipCode']}",
+    "{claim['Payee']['TaxID']}",
+    "{claim['ContractCode']}",
+    "{claim['MedicalRecordNumber']}",
+    "{claim['PolicyNumber']}",
+    "{claim['PeriodStart']}",
+    "{claim['PeriodEnd']}",
+    "{claim['ReceiveDate']}",
     "{services}",
-    "{claim["NPI"]}",
-    "{claim["PatientControlNumber"]}",
-    {claim["TotalClaimChargeAmount"]},
-    {claim["ClaimPaymentAmount"]},
-    "{claim["ServiceDate"]}",
-    "{claim["Payee"]["Name"]}",
-    "{claim["Payee"]["NPI"]}",
-    "{claim["Payee"]["TaxID"]}",
-    "{claim["Payer"]["Name"]}",
-    "{claim["Payer"]["Address"]}",
-    "{claim["Payer"]["City"]}",
-    "{claim["Payer"]["State"]}",
-    "{claim["Payer"]["ZipCode"]}",
     "{filepath}",
     {cnt}
   ),"""
   total += 1
 
 def start_add_835():
-  q = "INSERT INTO parsed_835_all SELECT * FROM parsed_835"
-  cursor.execute(q)
+  # q = "INSERT INTO parsed_835_all SELECT * FROM parsed_835"
+  # cursor.execute(q)
   q = "DELETE FROM parsed_835"
   cursor.execute(q)
   mysql_conn.commit()
@@ -176,5 +218,5 @@ def start_add_837():
     query = "INSERT INTO parsed_837 VALUES "
 
 if __name__ == '__main__':
-  start_add_837()
+  # start_add_837()
   start_add_835()
