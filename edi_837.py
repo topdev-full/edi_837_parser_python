@@ -16,6 +16,9 @@ def parse_837(file_name):
     "AddressLine1": "",
     "AddressLine2": "",
   }
+  submitter = {
+    "Name": "",
+  }
   renderingProvider = {
     "Type": "",
     "FirstName": "",
@@ -108,6 +111,9 @@ def parse_837(file_name):
           "Birthday": '',
           "Gender": '',
           "SSN": '',
+          'RelationshipToSubscriber': '',
+          'TaxID': '',
+          'ID': '',
         }
         output['Claim'][-1]['Payer'] = {
           'Name': '',
@@ -117,6 +123,37 @@ def parse_837(file_name):
           'State': '',
           'ZipCode': '',
           'Address': '',
+        }
+        output['Claim'][-1]['Subscriber'] = {
+          'Name': '',
+          'ID': '',
+          'GroupName': '',
+          'InsurancePlanType': '',
+          'PayerSequence': '',
+        }
+        output['Claim'][-1]['ServiceFacility'] = {
+          'Name': '',
+          'NPI': '',
+          'Address': '',
+          'City': '',
+          'State': '',
+          'ZipCode': '',
+        }
+        output['Claim'][-1]['RenderingProvider'] = {
+          'Type': '',
+          'FirstName': '',
+          'LastName': '',
+          'Name': '',
+          'NPI': '',
+          'Taxonomy': '',
+          'Grouping': '',
+        }
+        output['Claim'][-1]['ReferringProvider'] = {
+          'Type': '',
+          'Name': '',
+          'FirstName': '',
+          'LastName': '',
+          'NPI': '',
         }
         output['Claim'][-1]['Diagnosis'] = []
         output['Claim'][-1]['Services'] = []
@@ -227,18 +264,27 @@ def parse_837(file_name):
         # print('provider', segments[index], index)
         while segments[index][0] == 'NM1':
           if segments[index][1] == 'DN': # referring provider
+            if segments[index][2] == '1':
+              output['Claim'][-1]['ReferringProvider']['Type'] = 'INDIVIDUAL'
+              output['Claim'][-1]['ReferringProvider']['FirstName'] = 'INDIVIDUAL'
+              output['Claim'][-1]['ReferringProvider']['LastName'] = 'INDIVIDUAL'
+            else:
+              output['Claim'][-1]['ReferringProvider']['Type'] = 'BUSINESS'
+              output['Claim'][-1]['ReferringProvider']['Name'] = segments[index][3]
+            output['Claim'][-1]['ReferringProvider']['NPI'] = segments[index][9]
             index += 1
           elif segments[index][1] == '82': # rendering provider
             if segments[index][2] == '1':
-              renderingProvider['Type'] = 'INDIVIDUAL'
-              renderingProvider['FirstName'] = segments[index][4]
-              renderingProvider['LastName'] = segments[index][3]
+              output['Claim'][-1]['RenderingProvider']['Type'] = 'INDIVIDUAL'
+              output['Claim'][-1]['RenderingProvider']['FirstName'] = segments[index][4]
+              output['Claim'][-1]['RenderingProvider']['LastName'] = segments[index][3]
             else:
-              renderingProvider['Type'] = 'BUSINESS'
-              renderingProvider['Name'] = segments[index][3]
-            renderingProvider['NPI'] = segments[index][9]
+              output['Claim'][-1]['RenderingProvider']['Type'] = 'BUSINESS'
+              output['Claim'][-1]['RenderingProvider']['Name'] = segments[index][3]
+            output['Claim'][-1]['RenderingProvider']['NPI'] = segments[index][9]
             index += 1
             if segments[index][0] == 'PRV':
+              output['Claim'][-1]['RenderingProvider']['Taxonomy'] = segments[index][3]
               index += 1
           elif segments[index][1] == '77': # service facility location
             index += 1
