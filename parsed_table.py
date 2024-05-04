@@ -135,7 +135,11 @@ def add_837(claim, filepath, cnt):
   global query
   global total
   id = str(uuid.uuid4())
-  diagnosis = ":".join(claim['Diagnosis'])
+  diagnosis = ""
+  for diagnos in claim['Diagnosis']:
+    diagnosis += diagnos['Type'] + '*' + diagnos['Code'] + ':'
+  if len(diagnosis) and diagnosis[-1] == ':':
+    diagnosis = diagnosis[:len(diagnosis)-1]
   services = ""
   for service in claim['Services']:
     services += f"{service['ChargeAmount']}|{service['Units']}|{service['ServiceDate']}|{service['SourceID']}|{service['Code']}|{service['Modifier']},"
