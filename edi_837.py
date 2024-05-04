@@ -5,7 +5,6 @@ def parse_837(file_name):
   output = {
     "Claim": []
   }
-  first = True
   billingProvider = {
     "Type": "",
     "NPI": "",

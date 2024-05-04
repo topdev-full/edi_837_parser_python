@@ -250,8 +250,8 @@ def add_837(claim, filepath, cnt):
   total += 1
 
 def start_add_837():
-  q = "INSERT INTO parsed_837_all SELECT * FROM parsed_837"
-  cursor.execute(q)
+  # q = "INSERT INTO parsed_837_all SELECT * FROM parsed_837"
+  # cursor.execute(q)
   q = "DELETE FROM parsed_837"
   cursor.execute(q)
   mysql_conn.commit()
